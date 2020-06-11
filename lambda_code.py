@@ -9,8 +9,6 @@ from botocore.vendored.requests.auth import HTTPBasicAuth
 
 access_token = 'xoxb-1133836710359-1171538815537-ZTSZL4B92kh0UGAaowWR0l5C'
 verification_token = 'PxKCVNMUEznFN5BPhthV4ETf'
-jira_token = 'ZDKt2Uch4SqwbzXQAQRn78F4'
-git_token = "8a29a1870fc8700f5550b2a840096b9d085a61d9"
 
 # def lambda_handler(event, context):
 #     message_from_slack = dict(urlparse.parse_qsl(event["body"]))
