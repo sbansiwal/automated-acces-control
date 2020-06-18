@@ -7,9 +7,16 @@ import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
 
+<<<<<<< HEAD
 #access_token = "xoxb-1133836710359-1171538815537-ZTSZL4B92kh0UGAaowWR0l5C"
 access_token = "xoxb-XXXXXXXXXX-XXXXXXXXXXX-XXXXXXXXXXXXXX"
 verification_token = "XXXXXXXXXXXXXXXX"
+=======
+access_token = "XXX-YYYYYYYYYY-XXXXXXX-YYYYYYYYYY'
+verification_token = "XXXXXXXXXXXXX"
+git_token = "YYYYYYYYYYYYY"
+jira_token = "XXXXXXXXXXXX"
+>>>>>>> e312db4d229cae977e70ef8522245d7d2454fad5
 
 def lambda_handler(event, context):
     
@@ -150,7 +157,17 @@ def random_event(event, context):
         "headers": { }
     }
 
+<<<<<<< HEAD
     
     
     
     
+=======
+#     return {
+#         "isBase64Encoded": True,
+#         "statusCode": 200,
+#         "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
+#         "headers": { }
+#     }
+    
+>>>>>>> e312db4d229cae977e70ef8522245d7d2454fad5
