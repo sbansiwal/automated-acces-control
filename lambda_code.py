@@ -7,77 +7,38 @@ import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
 
-access_token = 'xoxb-1133836710359-1171538815537-ZTSZL4B92kh0UGAaowWR0l5C'
-verification_token = 'PxKCVNMUEznFN5BPhthV4ETf'
-jira_token = 'ZDKt2Uch4SqwbzXQAQRn78F4'
-git_token = "8a29a1870fc8700f5550b2a840096b9d085a61d9"
-
-# def lambda_handler(event, context):
-#     message_from_slack = dict(urlparse.parse_qsl(event["body"]))
-    
-#     jiraID = message_from_slack['text']
-    
-#     url = "https://sunilbansiwal.atlassian.net/rest/api/3/issue/" + str(jiraID)
-    
-#     auth = HTTPBasicAuth("sunilssb786@gmail.com", "ZDKt2Uch4SqwbzXQAQRn78F4")
-
-#     headers = {
-#       "Accept": "application/json"
-#     }
-    
-#     response = requests.request(
-#       "GET",
-#       url,
-#       headers=headers,
-#       auth=auth
-#     )
-    
-#     print(dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
-    
-#     issue_payload = loads(response.text)
-    
-#     val = "false"
-    
-#     if "errorMessages" in issue_payload:
-#         val = "true"
-
-#     if val == "false":
-#         return {
-#             "isBase64Encoded": True,
-#             'statusCode': 200,
-#             'body': "Issue status: " + issue_payload['fields']['status']['name'],
-#             'headers': { }
-#         }
-#     else:
-#         return {
-#             "isBase64Encoded": True,
-#             'statusCode': 200,
-#             'body':issue_payload["errorMessages"][0],
-#             'headers': { }
-#         }
+#access_token = "xoxb-1133836710359-1171538815537-ZTSZL4B92kh0UGAaowWR0l5C"
+access_token = "xoxb-XXXXXXXXXX-XXXXXXXXXXX-XXXXXXXXXXXXXX"
+verification_token = "XXXXXXXXXXXXXXXX"
 
 def lambda_handler(event, context):
-    message_from_slack = dict(urlparse.parse_qsl(event["body"]))
-    #print(message_from_slack)
-    username = message_from_slack["text"]
-    #print(text)
     
-    # print(username)
-    # print(email)
+    slack_payload = dict(urlparse.parse_qsl(event["body"]))
+    slack_message = slack_payload["text"]
+    words = slack_message.split(' ')
     
-    # return {
-    #     "isBase64Encoded": True,
-    #     "statusCode": 200,
-    #     "body": username,
-    #     "headers": { }
-    # }
+    if words[0] == "Jira":
+        return jira_handler(words)
+    elif words[0] == "Github":
+        return github_handler(words)
+    else:
+        return random_event(event, context)
+
+
+# FOR GITHUB
+def github_handler(slack_message):
+    git_token = "XXXXXXXXXXXXXXXXXXX"
     
-    url = "https://api.github.com/orgs/test-webhook-events/memberships/" + str(username)
-    
+    username = slack_message[1]
+    print(username)
+
+    url = "https://api.github.com/orgs/test-webhookevents/memberships/" + str(username)
+    #url = "https://api.github.com/orgs/test-webhook-events/members"
+
     headers = {
       "Accept": "application/json",
       "Content-Type": "application/json",
-      "Authorisation": "token " + git_token
+      "Authorization": "Bearer " + git_token
     }
     
     payload = dumps( {
@@ -100,52 +61,96 @@ def lambda_handler(event, context):
         "headers": { }
     }
     
-# def lambda_handler(event, context):
-#     message_from_slack = dict(urlparse.parse_qsl(event["body"]))
-#     #print(message_from_slack)
-#     text = message_from_slack["text"]
-#     #print(text)
     
-#     username, email = text.split(' ', 1)
+# FOR JIRA CLOUD    
+def jira_handler(slack_message):
+    jira_token = "XXXXXXXXXXXXXXXXXXX"
+    username = slack_message[1]
+    email = slack_message[2]
     
-#     # print(username)
-#     # print(email)
+    # print(username)
+    # print(email)
     
-#     # return {
-#     #     "isBase64Encoded": True,
-#     #     "statusCode": 200,
-#     #     "body": username,
-#     #     "headers": { }
-#     # }
+    # return {
+    #     "isBase64Encoded": True,
+    #     "statusCode": 200,
+    #     "body": username,
+    #     "headers": { }
+    # }
     
-#     url = "https://sunilbansiwal.atlassian.net/rest/api/3/user"
+    url = "https://sunilbansiwal.atlassian.net/rest/api/3/user"
 
-#     auth = HTTPBasicAuth("sunilssb786@gmail.com", jira_token)
+    auth = HTTPBasicAuth("sunilssb786@gmail.com", jira_token)
     
-#     headers = {
-#       "Accept": "application/json",
-#       "Content-Type": "application/json"
-#     }
+    headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    }
     
-#     payload = dumps( {
-#       "emailAddress": email,
-#       "displayName": username,
-#     })
+    payload = dumps( {
+      "emailAddress": email,
+      "displayName": username,
+    })
     
-#     response = requests.request(
-#       "POST",
-#       url,
-#       data=payload,
-#       headers=headers,
-#       auth=auth
-#     )
+    response = requests.request(
+      "POST",
+      url,
+      data=payload,
+      headers=headers,
+      auth=auth
+    )
     
-#     print(dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
+    print(dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
 
-#     return {
-#         "isBase64Encoded": True,
-#         "statusCode": 200,
-#         "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
-#         "headers": { }
-#     }
+    return {
+        "isBase64Encoded": True,
+        "statusCode": 200,
+        "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
+        "headers": { }
+    }
+
+
+def random_event(event, context):
+    message_from_slack = dict(urlparse.parse_qsl(event["body"]))
+    #payload = loads(event["body"])
+    
+    url = "https://slack.com/api/conversations.open"
+    
+    # return {
+    #     "isBase64Encoded": True,
+    #     "statusCode": 200,
+    #     "body": dumps("Hi"),
+    #     "headers": { }
+    # }
+    
+    headers = {
+        "Content-type": "application/json", 
+        "Accept": "application/json",
+        "Authorization": "Bearer " + access_token,
+    }
+    
+    data = {
+        "users": "U015QP5QHN0",
+        "text": "Hi",
+        "charset": "test"
+    }
+    
+    #print(payload)
+    response = requests.request(
+        "POST", 
+        url,
+        headers = headers, 
+        data = dumps(data)
+    )
+    
+    return {
+        "isBase64Encoded": True,
+        "statusCode": 200,
+        "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
+        "headers": { }
+    }
+
+    
+    
+    
     
