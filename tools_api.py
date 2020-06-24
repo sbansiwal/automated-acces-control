@@ -7,29 +7,13 @@ import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
 
-access_token = "xoxb-XXXXXXXXXX-XXXXXXXXX-XXXXXXXXXXXXX"
-verification_token = "XXXXXXXXXXXXXXXXXXX"
-
-def lambda_handler(event, context):
-    
-    slack_payload = dict(urlparse.parse_qsl(event["body"]))
-    slack_message = slack_payload["text"]
-    words = slack_message.split(' ')
-    
-    if words[0] == "Jira":
-        return jira_handler(words)
-    elif words[0] == "Github":
-        return github_handler(words)
-    else:
-        return random_event(event, context)
-
+access_token = "XXXXXXXXXXX"
+verification_token = "XXXXXXXXXX"
 
 # FOR GITHUB
-def github_handler(slack_message):
-    git_token = "XXXXXXXXXXXXXXXXXXX"
+def github_handler(username, user_id):
+    git_token = "XXXXXXXXXXX"
     
-    username = slack_message[1]
-    print(username)
 
     url = "https://api.github.com/orgs/test-webhookevents/memberships/" + str(username)
     #url = "https://api.github.com/orgs/test-webhook-events/members"
@@ -63,19 +47,9 @@ def github_handler(slack_message):
     
 # FOR JIRA CLOUD    
 def jira_handler(slack_message):
-    jira_token = "XXXXXXXXXXXXXXXXXXX"
+    jira_token = "XXXXXXXXXXXX"
     username = slack_message[1]
     email = slack_message[2]
-    
-    # print(username)
-    # print(email)
-    
-    # return {
-    #     "isBase64Encoded": True,
-    #     "statusCode": 200,
-    #     "body": username,
-    #     "headers": { }
-    # }
     
     url = "https://sunilbansiwal.atlassian.net/rest/api/3/user"
 
@@ -107,49 +81,3 @@ def jira_handler(slack_message):
         "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
         "headers": { }
     }
-
-
-def random_event(event, context):
-    message_from_slack = dict(urlparse.parse_qsl(event["body"]))
-    #payload = loads(event["body"])
-    
-    url = "https://slack.com/api/conversations.open"
-    
-    # return {
-    #     "isBase64Encoded": True,
-    #     "statusCode": 200,
-    #     "body": dumps("Hi"),
-    #     "headers": { }
-    # }
-    
-    headers = {
-        "Content-type": "application/json", 
-        "Accept": "application/json",
-        "Authorization": "Bearer " + access_token,
-    }
-    
-    data = {
-        "users": "U015QP5QHN0",
-        "text": "Hi",
-        "charset": "test"
-    }
-    
-    #print(payload)
-    response = requests.request(
-        "POST", 
-        url,
-        headers = headers, 
-        data = dumps(data)
-    )
-    
-    return {
-        "isBase64Encoded": True,
-        "statusCode": 200,
-        "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
-        "headers": { }
-    }
-
-    
-    
-    
-    
