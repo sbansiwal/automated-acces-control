@@ -6,13 +6,14 @@ import base64
 import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
+from helper_functions import get_user_info
 
-access_token = "XXXXXXXXXXX"
-verification_token = "XXXXXXXXXX"
+access_token = "XXXXXXXXXXXXXX"
+verification_token = "XXXXXXXXXXXXXX"
 
-# FOR GITHUB
+# to get github access
 def github_handler(username, user_id):
-    git_token = "XXXXXXXXXXX"
+    git_token = "XXXXXXXXXXXXXX"
     
 
     url = "https://api.github.com/orgs/test-webhookevents/memberships/" + str(username)
@@ -35,7 +36,7 @@ def github_handler(username, user_id):
       headers=headers
     )
     
-    print(dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
+    #print(dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
 
     return {
         "isBase64Encoded": True,
@@ -45,11 +46,14 @@ def github_handler(username, user_id):
     }
     
     
-# FOR JIRA CLOUD    
-def jira_handler(slack_message):
-    jira_token = "XXXXXXXXXXXX"
-    username = slack_message[1]
-    email = slack_message[2]
+# to get jira access    
+def jira_handler(user_id):
+    jira_token = "XXXXXXXXXXXXXX"
+    user_info = get_user_info(user_id)
+    user_profile = user_info["profile"]
+    username = user_profile["display_name"]
+    email = user_profile["email"]
+    #print(username," : ", email)
     
     url = "https://sunilbansiwal.atlassian.net/rest/api/3/user"
 
@@ -81,3 +85,4 @@ def jira_handler(slack_message):
         "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
         "headers": { }
     }
+
