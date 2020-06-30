@@ -6,8 +6,12 @@ import base64
 import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
+from datetime import datetime
+import string
 from message_functions import *
 from tools_api import *
+from helper_functions import *
+from database_api import *
 
 # to check if the interactive message is from user, manager or admin
 def check_interactive_message(payload):
@@ -31,33 +35,48 @@ def check_interactive_message(payload):
 
 # checks the interactive message response from manager
 def check_interactive_message_manager(payload):
-    #payload = loads(payload)
-    #print(payload)
+    user_info = get_user_info(payload["original_message"]["attachments"][0]["callback_id"])
+    user_profile = user_info["profile"]
     
     if "type" in payload:
         if payload["type"] == "interactive_message":
             if payload["actions"][0]["name"] == "approve":
                 if payload["actions"][0]["value"] == "jira":
-                    request_admin(payload)
+                    tool_access = check_record(user_profile["email"], "jira", "tool_status")
+                    #tool_access = check_record("user12@test.com", "jira", "tool_status")
+
+                    if tool_access == "no":
+                        request_admin(payload)
+                        message = "Request forwarded to admin"
+                    else:
+                        message = "Jira access already given"
+                        
                     return {
                         "isBase64Encoded": True,
                         "statusCode": 200,
-                        "body": "Request forwarded to admin",
+                        "body": message,
                         "headers":  { }
                     }
                 elif payload["actions"][0]["value"] == "github":
-                    request_admin(payload)
+                    tool_access = check_record(user_profile["email"], "github", "tool_status")
+                    #tool_access = check_record("usery@test.com", "github", "tool_status")
+                    if tool_access == "no":
+                        request_admin(payload)
+                        message = "Request forwarded to admin"
+                    else:
+                        message = "GitHub access already given"
+                        
                     return {
                         "isBase64Encoded": True,
                         "statusCode": 200,
-                        "body": "Request forwarded to admin",
+                        "body": message,
                         "headers":  { }
                     }
                 else:
                     return {
                         "isBase64Encoded": True,
                         "statusCode": 200,
-                        "body": "Tool not specified",
+                        "body": "Tool not listed under automated access control",
                         "headers":  { }
                     }
             else:
@@ -86,19 +105,43 @@ def check_interactive_message_manager(payload):
 
 # checks the interactive message response from the admin
 def check_interactive_message_admin(payload):
-    #payload = loads(payload)
-    #print(payload)
+    user_info = get_user_info(payload["original_message"]["attachments"][0]["callback_id"])
+    user_profile = user_info["profile"]
+    
+    admin_info = get_user_info(payload["user"]["id"])
+    admin_profile = admin_info["profile"]
     
     if "type" in payload:
         if payload["type"] == "interactive_message":
             if payload["actions"][0]["name"] == "approve":
                 if payload["actions"][0]["value"] == "jira":
-                    response = jira_handler(payload["original_message"]["attachments"][0]["callback_id"])
-                    if response["active"] == "true":
-                        message = "Jira access granted"
+                    tool_access = check_record(user_profile["email"], "jira", "tool_status")
+                    #tool_access = check_record("user12@test.com", "jira", "tool_status")
+                    print("tools access : ", tool_access)
+                    
+                    if tool_access == "no":
+                        response = jira_handler(payload["original_message"]["attachments"][0]["callback_id"])
+                        print(response)
                         
+                        if "active" in response and response["active"] == True:
+                            message = "Jira access granted"
+                            update_fields = {
+                                "active": "yes",
+                                "approved_by": admin_profile["real_name"] ,
+                                "approved_time": str(datetime.now())
+                            }
+                            #update_response = update_user_record("user12@test.com", "jira", update_fields)
+                            update_response = update_user_record(user_profile["email"], "jira", update_fields)
+                            print("update response: ", update_response)
+                            
+                            if update_response == "error updating":
+                                message = "error adding access approval to database"
+                        else:
+                            message = "Jira access not granted due to some error"
+                                
                     else:
-                        message = "Jira Access not granted due to some error"
+                        message = "Jira access already given"
+                    
                     return {
                         "isBase64Encoded": True,
                         "statusCode": 200,
@@ -106,11 +149,27 @@ def check_interactive_message_admin(payload):
                         "headers":  { }
                     }
                 elif payload["actions"][0]["value"] == "github":
-                    response = github_handler(payload["original_message"]["attachments"][0]["fallback"], payload["original_message"]["attachments"][0]["callback_id"])
-                    if response["active"] == "true":
-                        message = "GitHub access granted"
+                    tool_access = check_record(user_profile["email"], "github", "tool_status")
+                   # tool_access = check_record("usery@test.com", "github", "tool_status")
+                    if tool_access == "no":
+                        response = github_handler(payload["original_message"]["attachments"][0]["fallback"], payload["original_message"]["attachments"][0]["callback_id"])
+                        
+                        if "active" in response and response["active"] == True:
+                            message = "GitHub access granted"
+                            update_fields = {
+                                "active": "yes",
+                                "approved_by": admin_profile["real_name"] ,
+                                "approved_time": datatime.now()
+                            }
+                            update_response = update_user_record(user_profile["email"], "github", update_fields)
+                            if update_response == "error updating":
+                                message = "error adding access approval to database"
+                        else:
+                            message = "GitHub access not granted due to some error"
+                            
                     else:
-                        message = "Github Access not granted due to some error"
+                        message = "GitHub access already given"
+                        
                     return {
                         "isBase64Encoded": True,
                         "statusCode": 200,
@@ -121,7 +180,7 @@ def check_interactive_message_admin(payload):
                     return {
                         "isBase64Encoded": True,
                         "statusCode": 200,
-                        "body": "Tool not specified",
+                        "body": "Tool not listed under automated access control",
                         "headers":  { }
                     }
             else:
@@ -150,33 +209,76 @@ def check_interactive_message_admin(payload):
 
 # checks the interactive message response from the user        
 def check_interactive_message_user(payload):
-    #payload = loads(payload)
-    #print(payload)
+    user_info = get_user_info(payload["user"]["id"])
+    user_profile = user_info["profile"]
     
     if "type" in payload:
         if payload["type"] == "interactive_message":
+            
             if payload["actions"][0]["name"] == "github":
-                request_manager(payload)
+                request_details = {
+                    "email": user_profile["email"],
+                    "id": get_random_alphaNumeric_string(),
+                    "name": user_profile["real_name"],
+                    "tool": "github" 
+                }
+                response = add_user(request_details)
+                
+                if response == "error adding":
+                    message = "Error adding request to database"
+                else:
+                    message = "Request forwarded to manager for github access"
+                    request_manager(payload)
+                    
                 return {
                     "isBase64Encoded": True,
                     "statusCode": 200,
-                    "body": "Request sent to manager",
+                    "body": message,
                     "headers":  { }
                 }
             elif payload["actions"][0]["name"] == "jira":
-                request_manager(payload)
+                request_details = {
+                    "email": user_profile["email"],
+                    #"email": "user12@test.com",
+                    "id": get_random_alphaNumeric_string(),
+                    #"name": "testuser12",
+                    "name": user_profile["real_name"],
+                    "tool": "jira" 
+                }
+                response = add_user(request_details)
+            
+                if response == "error adding":
+                    message = "Error adding request to database"
+                else:
+                    message = "Request forwarded to manager for jira access"
+                    request_manager(payload)
+                    
                 return {
                     "isBase64Encoded": True,
                     "statusCode": 200,
-                    "body": "Request sent to manager",
+                    "body": message,
                     "headers":  { }
                 }
             elif payload["actions"][0]["name"] == "sumologic":
+                request_details = {
+                    "email": user_profile["email"],
+                    "id": get_random_alphaNumeric_string(),
+                    "name": user_profile["real_name"],
+                    "tool": "sumologic" 
+                }
+                response = add_user(request_details)
+                
+                if response == "error adding":
+                    message = "Error adding request to database"
+                else:
+                    message = "Request forwarded to manager for sumologic access"
+                    request_manager(payload)
+                    
                 return {
                     "isBase64Encoded": True,
                     "statusCode": 200,
-                    "body": "Request sent to manager",
-                    "headers":  { }    
+                    "body": message,
+                    "headers":  { }
                 }
             else:
                 return {

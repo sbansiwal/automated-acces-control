@@ -8,12 +8,12 @@ from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
 from helper_functions import get_user_info
 
-access_token = "XXXXXXXXXXXXXX"
-verification_token = "XXXXXXXXXXXXXX"
+access_token = "XXXXXXXXXXX"
+verification_token = "XXXXXXXXXXX"
 
 # to get github access
 def github_handler(username, user_id):
-    git_token = "XXXXXXXXXXXXXX"
+    git_token = "XXXXXXXXXXX"
     
 
     url = "https://api.github.com/orgs/test-webhookevents/memberships/" + str(username)
@@ -48,12 +48,11 @@ def github_handler(username, user_id):
     
 # to get jira access    
 def jira_handler(user_id):
-    jira_token = "XXXXXXXXXXXXXX"
+    jira_token = "XXXXXXXXXXX"
     user_info = get_user_info(user_id)
     user_profile = user_info["profile"]
     username = user_profile["display_name"]
     email = user_profile["email"]
-    #print(username," : ", email)
     
     url = "https://sunilbansiwal.atlassian.net/rest/api/3/user"
 
@@ -77,12 +76,9 @@ def jira_handler(user_id):
       auth=auth
     )
     
-    print(dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
+    reponse = dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": "))
+    json_response = loads(reponse)
+    return json_response
 
-    return {
-        "isBase64Encoded": True,
-        "statusCode": 200,
-        "body": dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")),
-        "headers": { }
-    }
+    
 

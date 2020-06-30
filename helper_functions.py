@@ -6,9 +6,15 @@ import base64
 import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
+import random
+import string
 
-access_token = "XXXXXXXXXXXXXXXXXXX"
-verification_token = "XXXXXXXXXXXXXXXXXXX"
+access_token = "XXXXXXXXXXXXXXX"
+verification_token = "XXXXXXXXXXXXXXX"
+
+def get_random_alphaNumeric_string(stringLength=20):
+    lettersAndDigits = string.ascii_letters + string.digits
+    return ''.join((random.choice(lettersAndDigits) for i in range(stringLength)))
 
 # To get user info from the user_id 
 def get_user_info(user_id):
@@ -31,4 +37,3 @@ def get_user_info(user_id):
     
     return json_response     
         
-
