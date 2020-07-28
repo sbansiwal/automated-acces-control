@@ -7,15 +7,16 @@ import os
 from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
 from helper_functions import *
+from database_api import *
 
-access_token = "XXXXXXXXXXXXXX"
-verification_token = "XXXXXXXXXXXXXX"
+access_token = "xoxb-1133836710359-1171538815537-kt1EaTW5Hm9hAgDcwrpVOc19"
+verification_token = "PxKCVNMUEznFN5BPhthV4ETf"
 
 # sends the tools to user after he requests them using slash command
 def send_tools_user(user_id):    
     user_info = get_user_info(user_id)
     user_profile = user_info["profile"]
-    print(user_profile)
+    #print(user_profile)
     
     url = "https://slack.com/api/chat.postMessage"
     
@@ -109,7 +110,8 @@ def request_manager(payload):
         "text": "Hi " + manager_profile["real_name"],
         "attachments": [
             {
-                "text": user_profile["real_name"] + " wants " + payload["actions"][0]["name"] + " access",
+                #"text": user_profile["real_name"] + " wants " + payload["actions"][0]["name"] + " access",
+                "text": "<@" + payload["user"]["id"] + ">" + " wants `" + payload["actions"][0]["name"] + "` access",
                 "fallback": "Shame... buttons aren't supported in this land",
                 "callback_id": payload["user"]["id"],
                 "color": "#3AA3E3",
@@ -158,6 +160,21 @@ def request_manager_by_text(user_id, words):
     accessTool = words[0]
     username = words[1]
     
+    request_details = {
+        #"email": user_profile["email"],
+        "email": "user23@test.com",
+        "id": get_random_alphaNumeric_string(),
+        "name": "user23test",
+        #"name": user_profile["real_name"],
+        "tool": words[0] 
+    }
+    
+    response = add_user(request_details)
+    print("response in manager by text: ", response)
+    
+    if response == "error adding":
+        return response
+    
     url = "https://slack.com/api/chat.postMessage"
     
     headers = {
@@ -171,7 +188,7 @@ def request_manager_by_text(user_id, words):
         "text": "Hi " + manager_profile["real_name"],
         "attachments": [
             {
-                "text": user_profile["real_name"] + " wants " + accessTool + " access",
+                "text": "<@" + user_id + ">" + " wants " + accessTool + " access",
                 "fallback": username,
                 "callback_id": user_id,
                 "color": "#3AA3E3",
@@ -271,7 +288,7 @@ def request_admin(payload):
     
 
 # sends the disapproval message to user if manager/admin disapproves tool access request
-def disapproval_message(user_id, user_type):
+def disapproval_message(user_id, user_type, tool):
     url = "https://slack.com/api/chat.postMessage"
     
     headers = {
@@ -282,7 +299,7 @@ def disapproval_message(user_id, user_type):
     
     data = {
         "channel": user_id,
-        "text": user_type + " has disapproved your request"
+        "text": user_type + " has disapproved your request for `" + tool + "` access"
     }
     
     response = requests.request(

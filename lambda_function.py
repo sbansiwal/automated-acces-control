@@ -8,15 +8,18 @@ from urllib import parse as urlparse
 from botocore.vendored.requests.auth import HTTPBasicAuth
 from message_functions import *
 from check_message import check_interactive_message
-from helper_functions import *
+from database_api import *
 
-access_token = "XXXXXXXXXXXXXX"
-verification_token = "XXXXXXXXXXXXXX"
+####### check update_user_record in check_interactive_message_admin  ###### .    
+        
+access_token = "xoxb-1133836710359-1171538815537-kt1EaTW5Hm9hAgDcwrpVOc19"
+verification_token = "PxKCVNMUEznFN5BPhthV4ETf"
+
 
 # This is the lambda function. All the events triggered through the API are executed here
 def lambda_handler(event, context):
     slack_payload = dict(urlparse.parse_qsl(event["body"]))
-    #print(slack_payload)
+
     if "payload" in slack_payload:
         return check_interactive_message(slack_payload["payload"])
     elif "text" not in slack_payload:
@@ -29,10 +32,15 @@ def lambda_handler(event, context):
 
 def forward_request(user_id, words):
     response = request_manager_by_text(user_id, words)
-    return{
+    if response == "error adding":
+        message = "Error adding request to database"
+    else:
+        message = "Request forwarded to manager"
+        
+    return {
         "isBase64Encoded": True,
         "statusCode": 200,
-        "body": "Request forwarded to manager",
+        "body": message,
         "headers": { }
     }
 

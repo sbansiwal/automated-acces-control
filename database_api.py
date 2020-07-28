@@ -9,7 +9,7 @@ from botocore.vendored.requests.auth import HTTPBasicAuth
 
 # get user record from primary key
 def get_user_record(key):
-    url = "https://69e77649dae0.ngrok.io/get/" + key
+    url = "https://6f0c74c99f79.ngrok.io/get/" + key
     
     headers = {
         "Content-type": "application/json", 
@@ -34,7 +34,8 @@ def add_user(body):
     if record_present == "yes":
         return "error adding"
         
-    url = "https://69e77649dae0.ngrok.io/add"
+    url = "https://6f0c74c99f79.ngrok.io/add"
+    
     
     headers = {
         "Content-type": "application/json", 
@@ -54,9 +55,12 @@ def add_user(body):
     
 # update user record in the database    
 def update_user_record(email, tool, body):
-    id = check_record(email, tool, "get_id")
+    id_response = check_record(email, tool, "get_id")
     
-    url = "https://69e77649dae0.ngrok.io/update"
+    if id_response == "Tunnel error":
+        return id_response
+        
+    url = "https://6f0c74c99f79.ngrok.io/update"
     
     headers = {
         "Content-type": "application/json", 
@@ -64,7 +68,7 @@ def update_user_record(email, tool, body):
     }
     
     data = {
-        "id": id,
+        "id": id_response,
         "active": body["active"],
         "approved_by": body["approved_by"],
         "approved_time": body["approved_time"],
@@ -81,7 +85,7 @@ def update_user_record(email, tool, body):
 
 # check user record for tool access status
 def check_record(email, tool, purpose):
-    url = "https://69e77649dae0.ngrok.io/check"
+    url = "https://6f0c74c99f79.ngrok.io/check"
     
     headers = {
         "Content-type": "application/json", 
@@ -99,22 +103,48 @@ def check_record(email, tool, purpose):
         headers = headers,
         data = dumps(data)
     )
-    print("email : ", email)
-    print("tool : ", tool)
-    print("response : ", response.text)
-    response = response = dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": "))
+    
+    if response.text == "Tunnel 6f0c74c99f79.ngrok.io not found":
+        return "Tunnel error"
+    
+    print(response.text)
+    
+    response = dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": "))
     json_response = loads(response)
-    #print(json_response)
-    #print("active : ", json_response["active"])
     
     if purpose == "tool_status":
-        return json_response["active"]
+        if "active" in json_response:
+            return json_response["active"]
+        else:
+            "response_error"
     elif purpose == "get_id":
-        return json_response["id"]
+        if "id" in json_response:
+            return json_response["id"]
+        else:
+            return "response_error"
     else:
         if "name" in json_response:
             return "yes"
         else:
             return "no"
+
+# get tool access list    
+def get_access_list():
+    url = "https://6f0c74c99f79.ngrok.io/list"
     
+    headers = {
+        "Content-type": "application/json", 
+        "Accept": "application/json",
+    }
+    
+    response = requests.request(
+        "GET",
+        url,
+        headers = headers
+    )
+    
+    response = dumps(loads(response.text), sort_keys=True, indent=4, separators=(",", ": "))
+    json_response = loads(response)
+    return json_response
+
     
