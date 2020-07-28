@@ -9,8 +9,8 @@ from botocore.vendored.requests.auth import HTTPBasicAuth
 import random
 import string
 
-access_token = "xoxb-1133836710359-1171538815537-kt1EaTW5Hm9hAgDcwrpVOc19"
-verification_token = "PxKCVNMUEznFN5BPhthV4ETf"
+access_token = "xoxb-XXXXXXXXXX"
+verification_token = "XXXXXXXXXXXX"
 
 
 def get_random_alphaNumeric_string(stringLength=20):
