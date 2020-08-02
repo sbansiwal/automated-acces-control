@@ -12,9 +12,8 @@ from database_api import *
 
 ####### check update_user_record in check_interactive_message_admin  ###### .    
         
-access_token = "xoxb-1133836710359-1171538815537-kt1EaTW5Hm9hAgDcwrpVOc19"
-verification_token = "PxKCVNMUEznFN5BPhthV4ETf"
-
+access_token = "xoxb-XXXXX-XXXXX-XXXXXX"
+verification_token = "XXXXXXXXXXXXX"
 
 # This is the lambda function. All the events triggered through the API are executed here
 def lambda_handler(event, context):
@@ -29,7 +28,6 @@ def lambda_handler(event, context):
         words = slack_message.split(' ')
         return forward_request(slack_payload["user_id"], words)
 
-
 def forward_request(user_id, words):
     response = request_manager_by_text(user_id, words)
     if response == "error adding":
@@ -43,7 +41,6 @@ def forward_request(user_id, words):
         "body": message,
         "headers": { }
     }
-
 
 # A dummy lambda handler
 def lambda_handler_2(event, context):

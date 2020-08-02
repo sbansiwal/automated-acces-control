@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "access-provisioning",
+  "private_key_id": "XXXXXXXXXXXXXX",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nXXXXXXXXX\nXXXXXXXXX\nXXXXXXXXX\nXXXXXXXXX=\n-----END PRIVATE KEY-----\n",
+  "client_email": "dispatch@access-provisioning.iam.gserviceaccount.com",
+  "client_id": "XXXXXXXXXXXXXX",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "XXXXXXXXXXXXXX",
+  "auth_provider_x509_cert_url": "XXXXXXXXXXXXXX",
+  "client_x509_cert_url": "XXXXXXXXXXXXXX"
+}

@@ -9,8 +9,7 @@ from botocore.vendored.requests.auth import HTTPBasicAuth
 from helper_functions import *
 from database_api import *
 
-access_token = "xoxb-1133836710359-1171538815537-kt1EaTW5Hm9hAgDcwrpVOc19"
-verification_token = "PxKCVNMUEznFN5BPhthV4ETf"
+access_token = "xoxb-XXXXX-XXXXX-XXXXXX"
 
 # sends the tools to user after he requests them using slash command
 def send_tools_user(user_id):    
@@ -87,7 +86,6 @@ def send_tools_user(user_id):
             "headers": { }
         }
 
-
 # sends the tool access request by the user to manager          
 def request_manager(payload):
     manager_info = get_user_info("U015UKJKXNW")
@@ -148,7 +146,6 @@ def request_manager(payload):
     #print(json_response)
     return json_response
     
-
 # sends the tool access request to manager if the access requires other user details
 def request_manager_by_text(user_id, words):    
     manager_info = get_user_info("U015UKJKXNW")
@@ -225,7 +222,6 @@ def request_manager_by_text(user_id, words):
     #print(json_response)
     return json_response
     
-
 # sends the tool access request by the user to admin     
 def request_admin(payload):
     admin_info = get_user_info("U015QP5QHN0")
@@ -286,7 +282,6 @@ def request_admin(payload):
     #print(json_response)
     return json_response
     
-
 # sends the disapproval message to user if manager/admin disapproves tool access request
 def disapproval_message(user_id, user_type, tool):
     url = "https://slack.com/api/chat.postMessage"

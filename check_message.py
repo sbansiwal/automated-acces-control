@@ -51,7 +51,6 @@ def check_interactive_message_user(payload):
         
     return response_message(message)
        
-       
 # checks the interactive message response from manager
 def check_interactive_message_manager(payload):
     user_id = payload["original_message"]["attachments"][0]["callback_id"]
@@ -75,7 +74,6 @@ def check_interactive_message_manager(payload):
         disapproval_message(payload["callback_id"], "Manager", tool)
         message = "`" + tool + "` access request by <@" + user_id + "> disapproved"
         return response_message(message)
-        
         
 # checks the interactive message response from the admin
 def check_interactive_message_admin(payload):

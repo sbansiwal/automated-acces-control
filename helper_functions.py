@@ -9,9 +9,7 @@ from botocore.vendored.requests.auth import HTTPBasicAuth
 import random
 import string
 
-access_token = "xoxb-XXXXXXXXXX"
-verification_token = "XXXXXXXXXXXX"
-
+access_token = "xoxb-XXXXX-XXXXX-XXXXXX"
 
 def get_random_alphaNumeric_string(stringLength=20):
     lettersAndDigits = string.ascii_letters + string.digits
@@ -38,7 +36,6 @@ def get_user_info(user_id):
     json_response = loads(response)
     return json_response     
 
-
 def check_response(response, tool):
     if tool == "jira":
         if "errorMessages" in response:
@@ -51,7 +48,6 @@ def check_response(response, tool):
     
     return "correct"  
     
-    
 def response_message(message):
     return {
         "isBase64Encoded": True,
@@ -60,14 +56,12 @@ def response_message(message):
         "headers":  { }
     }
     
-    
 def nil_response():
     return {
         "isBase64Encoded": True,
         "statusCode": 200,
         "body": ""
     }
-
 
 def tool_request_details(email, name, tool):
     return {
@@ -77,14 +71,12 @@ def tool_request_details(email, name, tool):
         "tool": tool
     }
     
-    
 def update_fields_json(active_status, admin_name, datetime):
     return {
         "active": active_status,
         "approved_by": admin_name,
         "approved_time": datetime
     }
-    
     
 def post_response(user_id, message):
     user_info = get_user_info(user_id)
